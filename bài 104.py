@@ -1,48 +1,82 @@
+import tkinter as tk
 import random
 
+def tao_ma_tran():
+    global A, n
+    try:
+        n = int(entry_n.get())
+        A = [[random.randint(-10, 10) for _ in range(n)] for _ in range(n)]
+
+        text_A.delete("1.0", tk.END)
+        for row in A:
+            text_A.insert(tk.END, " ".join(f"{x:4}" for x in row) + "\n")
+
+    except:
+        text_A.delete("1.0", tk.END)
+        text_A.insert(tk.END, "Nhập n hợp lệ!")
+
+def tao_B():
+    try:
+        B = [[0]*n for _ in range(n)]
+
+        # đường chéo chính
+        diag1 = {}
+        for d in range(-(n-1), n):
+            max_val = -10**9
+            for i in range(n):
+                j = i - d
+                if 0 <= j < n:
+                    max_val = max(max_val, A[i][j])
+            diag1[d] = max_val
+
+        # đường chéo phụ
+        diag2 = {}
+        for s in range(2*n - 1):
+            max_val = -10**9
+            for i in range(n):
+                j = s - i
+                if 0 <= j < n:
+                    max_val = max(max_val, A[i][j])
+            diag2[s] = max_val
+
+        # tạo B
+        for i in range(n):
+            for j in range(n):
+                B[i][j] = max(diag1[i - j], diag2[i + j])
+
+        text_B.delete("1.0", tk.END)
+        for row in B:
+            text_B.insert(tk.END, " ".join(f"{x:4}" for x in row) + "\n")
+
+    except:
+        text_B.delete("1.0", tk.END)
+        text_B.insert(tk.END, "Hãy tạo ma trận A trước!")
+
+# Cửa sổ
+root = tk.Tk()
+root.title("Ma trận A → B")
+root.geometry("500x450")
+
 # Nhập n
-n = int(input("Nhap bac ma tran: "))
+tk.Label(root, text="Nhập bậc ma trận n:").pack()
+entry_n = tk.Entry(root)
+entry_n.pack()
 
-# Tạo ma trận A
-A = [[random.randint(-10, 10) for _ in range(n)] for _ in range(n)]
+# Nút tạo A
+tk.Button(root, text="Tạo ma trận A", command=tao_ma_tran).pack(pady=5)
 
-# Xuất ma trận A
-for row in A:
-    for x in row:
-        print(f"{x:4}", end="")
-    print()
+# Hiển thị A
+tk.Label(root, text="Ma trận A:").pack()
+text_A = tk.Text(root, height=8)
+text_A.pack()
 
-# Tạo ma trận B
-B = [[0]*n for _ in range(n)]
+# Nút tạo B
+tk.Button(root, text="Tạo ma trận B", command=tao_B).pack(pady=5)
 
-# Tiền xử lý: max đường chéo chính (i - j)
-diag1 = {}
-for d in range(-(n-1), n):
-    max_val = -10**9
-    for i in range(n):
-        j = i - d
-        if 0 <= j < n:
-            max_val = max(max_val, A[i][j])
-    diag1[d] = max_val
+# Hiển thị B
+tk.Label(root, text="Ma trận B:").pack()
+text_B = tk.Text(root, height=8)
+text_B.pack()
 
-# Tiền xử lý: max đường chéo phụ (i + j)
-diag2 = {}
-for s in range(2*n - 1):
-    max_val = -10**9
-    for i in range(n):
-        j = s - i
-        if 0 <= j < n:
-            max_val = max(max_val, A[i][j])
-    diag2[s] = max_val
-
-# Tạo B
-for i in range(n):
-    for j in range(n):
-        B[i][j] = max(diag1[i - j], diag2[i + j])
-
-# Xuất ma trận B
-print("Ma tran B:")
-for row in B:
-    for x in row:
-        print(f"{x:4}", end="")
-    print()
+# Chạy
+root.mainloop()
